@@ -1,0 +1,187 @@
+<!--
+  Wedding Invite - Single-page scaffold (index.html)
+  - Uses the uploaded PDF: "WEDDING IV neww.pdf" (place in same repo root or /assets/)
+  - Password: TJ2025 (simple JS-based gate)
+  - PDF is embedded as a scrollable iframe (first thing visible after unlocking)
+  - RSVP form posts to Formspree (replace the action URL with your form endpoint or a Google Form embed)
+  - Structured for GitHub Pages: drop this file (index.html) + the PDF into a repo and enable Pages
+-->
+
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Wedding Invitation</title>
+  <meta name="description" content="Wedding invitation - enter password to view." />
+  <style>
+    :root{--bg:#faf7f5;--card:#ffffff;--accent:#bfa6a0;--text:#2b2b2b}
+    html,body{height:100%;margin:0;font-family:Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial}
+    body{background:linear-gradient(180deg,var(--bg),#fff);color:var(--text);display:flex;align-items:center;justify-content:center;padding:24px}
+    .container{width:100%;max-width:1100px;min-height:560px;background:var(--card);box-shadow:0 10px 30px rgba(20,20,20,0.08);border-radius:14px;overflow:hidden;display:flex;flex-direction:column}
+    header{padding:18px 28px;border-bottom:1px solid rgba(0,0,0,0.04);display:flex;align-items:center;justify-content:space-between}
+    header h1{font-size:18px;margin:0}
+    main{flex:1;display:flex;gap:20px;padding:18px}
+    /* Left: PDF viewer (primary) */
+    .viewer{flex:2;min-height:360px;background:#f7f5f4;border-radius:10px;overflow:hidden;display:flex;flex-direction:column}
+    .viewer iframe{border:0;width:100%;height:100%;}
+    /* Right: Info and RSVP */
+    .side{flex:1;display:flex;flex-direction:column;gap:12px}
+    .card{background:linear-gradient(180deg,#fff,#fff);padding:14px;border-radius:10px;box-shadow:0 6px 18px rgba(20,20,20,0.04);}
+    .muted{color:#666;font-size:14px}
+    label{display:block;font-weight:600;margin-bottom:6px}
+    input[type=text],input[type=email],textarea{width:100%;padding:10px;border-radius:8px;border:1px solid #e6e0de;font-size:15px}
+    button{background:var(--accent);color:#fff;border:none;padding:10px 14px;border-radius:8px;font-weight:700;cursor:pointer}
+    .countdown{display:flex;gap:8px;align-items:center}
+    .countdown .unit{background:#fff;padding:10px;border-radius:8px;min-width:56px;text-align:center;box-shadow:0 6px 12px rgba(10,10,10,0.03)}
+    /* Password overlay */
+    .overlay{position:fixed;inset:0;background:linear-gradient(180deg,rgba(20,20,20,0.55),rgba(20,20,20,0.45));display:flex;align-items:center;justify-content:center;padding:20px}
+    .pwbox{background:#fff;padding:28px;border-radius:12px;max-width:520px;width:100%;box-shadow:0 18px 60px rgba(10,10,10,0.35);text-align:center}
+    .pwbox h2{margin:0 0 8px 0}
+    .pwbox p{margin:0 0 18px 0;color:#666}
+    .pwrow{display:flex;gap:8px}
+    @media (max-width:880px){main{flex-direction:column}.side{order:2}.viewer{order:1;min-height:420px}}
+  </style>
+</head>
+<body>
+  <div class="container" aria-live="polite">
+    <header>
+      <h1>Your Wedding Invitation</h1>
+      <div class="muted">Protected</div>
+    </header>
+
+    <main>
+      <section class="viewer card" aria-label="Invitation document">
+        <!-- Place the uploaded PDF next to index.html in the repo, e.g. /WEDDING IV neww.pdf -->
+        <iframe id="pdfFrame" src="WEDDING IV neww.pdf"></iframe>
+      </section>
+
+      <aside class="side">
+        <div class="card">
+          <div class="muted">Countdown to the day</div>
+          <div id="count" class="countdown" aria-hidden="false">
+            <div class="unit"><div id="days">--</div><div class="muted">days</div></div>
+            <div class="unit"><div id="hours">--</div><div class="muted">hrs</div></div>
+            <div class="unit"><div id="minutes">--</div><div class="muted">mins</div></div>
+            <div class="unit"><div id="seconds">--</div><div class="muted">secs</div></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="muted">RSVP</div>
+          <!--
+            By default this posts to Formspree. Replace the action URL with your Formspree endpoint
+            or replace the form entirely with a Google Form embed (iframe) if you prefer.
+          -->
+          <form id="rsvpForm" action="https://formspree.io/f/your_form_id" method="POST">
+            <label for="name">Full name</label>
+            <input id="name" name="name" type="text" placeholder="Your full name" required />
+
+            <label for="email">Email</label>
+            <input id="email" name="email" type="email" placeholder="you@example.com" required />
+
+            <label for="guests">Number of guests</label>
+            <input id="guests" name="guests" type="text" placeholder="e.g. 2" required />
+
+            <label for="message">Message / dietary needs (optional)</label>
+            <textarea id="message" name="message" rows="3" placeholder="Any notes"></textarea>
+
+            <div style="margin-top:10px">
+              <button type="submit">Send RSVP</button>
+            </div>
+          </form>
+          <p class="muted" style="margin-top:10px;font-size:13px">Tip: to use Formspree, sign up and replace the form action with your unique endpoint. Alternatively embed a Google Form.</p>
+        </div>
+
+        <div class="card">
+          <div class="muted">Quick actions</div>
+          <p style="margin:8px 0 0 0">Share this link with guests. No custom domain selected.</p>
+        </div>
+      </aside>
+    </main>
+
+    <footer style="padding:12px 18px;border-top:1px solid rgba(0,0,0,0.04);font-size:13px;color:#888">Made with ❤️ — edit this template for final details.</footer>
+  </div>
+
+  <!-- Password overlay (simple client-side gate) -->
+  <div id="overlay" class="overlay" role="dialog" aria-modal="true">
+    <div class="pwbox">
+      <h2>Enter password to view</h2>
+      <p>To view the invitation, enter the event password.</p>
+      <div class="pwrow">
+        <input id="pw" type="password" placeholder="Password" style="flex:1;padding:10px;border-radius:8px;border:1px solid #e6e0de;font-size:16px" aria-label="Invitation password" />
+        <button id="pwBtn">Unlock</button>
+      </div>
+      <p id="pwHint" class="muted" style="margin-top:10px;display:none;color:#b00">Incorrect password — try again.</p>
+    </div>
+  </div>
+
+  <script>
+    // ====== CONFIG (edit as needed) ======
+    const PASSWORD = 'TJ2025';
+    // Set event date for countdown (replace with actual date/time)
+    // Format: 'YYYY-MM-DDTHH:MM:SS' (24-hour). Example: '2025-11-20T15:00:00'
+    const EVENT_DATE_ISO = '2025-11-20T15:00:00';
+    // =====================================
+
+    // Password gate logic
+    const overlay = document.getElementById('overlay');
+    const pwInput = document.getElementById('pw');
+    const pwBtn = document.getElementById('pwBtn');
+    const pwHint = document.getElementById('pwHint');
+
+    function unlock() {
+      const v = pwInput.value || '';
+      if (v.trim() === PASSWORD) {
+        overlay.style.display = 'none';
+        pwHint.style.display = 'none';
+        pwInput.value = '';
+        // focus to iframe for accessibility
+        document.getElementById('pdfFrame').focus();
+      } else {
+        pwHint.style.display = 'block';
+      }
+    }
+
+    pwBtn.addEventListener('click', unlock);
+    pwInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') unlock(); });
+
+    // Simple countdown
+    function startCountdown(isoStr) {
+      const target = new Date(isoStr);
+      if (isNaN(target)) return;
+      const daysEl = document.getElementById('days');
+      const hoursEl = document.getElementById('hours');
+      const minsEl = document.getElementById('minutes');
+      const secsEl = document.getElementById('seconds');
+
+      function tick() {
+        const now = new Date();
+        let diff = Math.max(0, Math.floor((target - now) / 1000));
+        const days = Math.floor(diff / 86400); diff %= 86400;
+        const hours = Math.floor(diff / 3600); diff %= 3600;
+        const mins = Math.floor(diff / 60); const secs = diff % 60;
+        daysEl.textContent = String(days).padStart(2,'0');
+        hoursEl.textContent = String(hours).padStart(2,'0');
+        minsEl.textContent = String(mins).padStart(2,'0');
+        secsEl.textContent = String(secs).padStart(2,'0');
+      }
+      tick();
+      setInterval(tick, 1000);
+    }
+
+    startCountdown(EVENT_DATE_ISO);
+
+    // Accessibility: trap focus to overlay while visible
+    document.addEventListener('focus', function(e){
+      if (overlay.style.display !== 'none') {
+        if (!overlay.contains(e.target)) {
+          e.stopPropagation();
+          pwInput.focus();
+        }
+      }
+    }, true);
+
+  </script>
+</body>
+</html>
